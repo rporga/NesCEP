@@ -420,7 +420,11 @@ Working strategic hypothesis. Validate with local brand, audience and media data
     <main>
       <header className="topbar">
         <a className="brandmark" href="#top" aria-label="NESCAFÉ RTD CEP Engine Builder home">
-          <span className="brandmark-kicker">NESCAFÉ RTD</span><span className="brandmark-name">CEP Engine Builder</span>
+          <img className="brandmark-logo" src="nescafe-red-mark.png" alt="" aria-hidden="true" />
+          <span className="brandmark-copy">
+            <span className="brandmark-kicker">NESCAFÉ RTD</span>
+            <span className="brandmark-name">CEP Engine Builder</span>
+          </span>
         </a>
         <div className="topbar-actions">
           <span className="draft-status"><span className="status-dot" /> Draft saved locally</span>

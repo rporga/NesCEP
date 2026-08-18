@@ -19,7 +19,9 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   display: flex; justify-content: space-between; padding: 18px max(5vw, 24px); position: sticky; top: 0; z-index: 20;
   backdrop-filter: blur(18px);
 }
-.brandmark { color: var(--navy); display: flex; flex-direction: column; gap: 1px; text-decoration: none; }
+.brandmark { align-items: center; color: var(--navy); display: flex; gap: 11px; text-decoration: none; }
+.brandmark-logo { display: block; flex: 0 0 auto; height: 42px; object-fit: contain; width: 46px; }
+.brandmark-copy { display: flex; flex-direction: column; gap: 1px; }
 .brandmark-kicker { font-size: 11px; font-weight: 800; letter-spacing: .12em; }
 .brandmark-name { font-size: 20px; font-weight: 800; letter-spacing: -.03em; }
 .topbar-actions { align-items: center; display: flex; gap: 14px; }
@@ -203,6 +205,10 @@ input[type="range"] { accent-color: var(--red); background: transparent; border:
 
 @media (max-width: 720px) {
   .topbar { padding: 14px 18px; }
+  .brandmark { gap: 8px; }
+  .brandmark-logo { height: 34px; width: 37px; }
+  .brandmark-kicker { font-size: 9px; }
+  .brandmark-name { font-size: 16px; }
   .topbar-actions .draft-status { display: none; }
   .ghost-button { font-size: 11px; padding: 9px 12px; }
   .hero { min-height: auto; padding: 58px 20px 48px; }
