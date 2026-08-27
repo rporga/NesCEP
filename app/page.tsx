@@ -1,11 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import {
+  marketProfiles,
+  markets,
+  type AudienceRoute,
+  type ClusterId,
+  type EngineId,
+  type MarketId,
+  type PriorityLevel,
+} from "./market-profiles";
 
-type EngineId = "start" | "reset" | "switch" | "yes" | "discover" | "share";
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 type Criterion = "brand" | "audience" | "media" | "distinctive" | "transfer";
-type ClusterId = "dach" | "benelux" | "nordics" | "cee" | "see";
-type AudienceRoute = "Explorer" | "Perfectionist" | "Balanced";
 type Evidence = Record<string, string>;
 type EngineScores = Record<EngineId, Record<Criterion, number>>;
 
@@ -84,8 +92,6 @@ const audienceRewards: Record<AudienceRoute, Record<EngineId, string>> = {
   },
 };
 
-type PriorityLevel = "H" | "M" | "S";
-
 const clusters: Record<ClusterId, {
   name: string; profile: string; driver: string; available: string; hero: string; media: string;
   levels: Record<EngineId, PriorityLevel>; moments: Record<EngineId, string>;
@@ -160,6 +166,158 @@ const clusters: Record<ClusterId, {
       share: "A beach, festival or café find becomes part of the group’s visible coffee ritual.",
     },
   },
+};
+
+const engineActivation: Record<EngineId, {
+  daypart: string; trigger: string; mediaRole: string; creatorStory: string; kpis: string;
+}> = {
+  start: {
+    daypart: "06:00–09:30 · wake-up, preparation and commute",
+    trigger: "Serve around first movement: leaving home, entering transit, arriving at work/university or beginning a morning routine.",
+    mediaRole: "Create fast recognition of the moment, then establish NESCAFÉ RTD as the cold, zero-prep way to get moving.",
+    creatorStory: "Show the real first friction of the day, the grab/open/sip, and the visible shift into motion. The product must enable the routine—not decorate it.",
+    kpis: "Attention in the first 2 seconds, completed views, branded search, store visits and morning sales response.",
+  },
+  reset: {
+    daypart: "13:00–16:30 · post-lunch, desk/study slump and warm-weather lull",
+    trigger: "Activate when energy visibly drops: after lunch, between meetings/classes or when heat makes the afternoon feel flat.",
+    mediaRole: "Interrupt passive scrolling with an immediate cold/sensory contrast and dramatise the return to pace.",
+    creatorStory: "Make the before-and-after believable: show the low point, a proper cold coffee break, and what the creator is ready to re-enter next.",
+    kpis: "Thumb-stop rate, video completion, saves, flavour interest, retail click-through and afternoon conversion.",
+  },
+  switch: {
+    daypart: "16:00–19:00 · work/study handover into errands, exercise or social time",
+    trigger: "Target moments when one role or place ends and another begins, especially mobility between work, study and personal plans.",
+    mediaRole: "Own the handover by linking portability and taste to the audience’s next mode.",
+    creatorStory: "Use a transition format: work-to-gym, lecture-to-city, desk-to-dinner or commute-to-evening. Keep the product as the bridge between modes.",
+    kpis: "Qualified reach in transition windows, video completion, store proximity response and purchase intent.",
+  },
+  yes: {
+    daypart: "Thursday–Sunday afternoons/evenings · spontaneous plan and event windows",
+    trigger: "Use messages, event calendars, weather, location and proximity signals that indicate a plan is forming now.",
+    mediaRole: "Turn indecision into action and make the product an easy choice on the way to the plan.",
+    creatorStory: "Start with the invitation or last-minute plan, show the decision to join, then bring NESCAFÉ RTD naturally into the journey.",
+    kpis: "Engagement, shares, map/store actions, event-area reach, incremental footfall and conversion.",
+  },
+  discover: {
+    daypart: "Mid-morning to early evening · browse, snack and shopping windows",
+    trigger: "Reach audiences while they are looking for flavours, reviews, café alternatives, new products or small treats.",
+    mediaRole: "Resolve trial uncertainty with flavour, texture, coffee-quality and value proof close to purchase.",
+    creatorStory: "Use a credible first-try or comparison format. Describe the taste specifically and show why this SKU is worth choosing again.",
+    kpis: "Saves, product-page views, search lift, sampling response, add-to-cart, trial and flavour-level repeat.",
+  },
+  share: {
+    daypart: "Social and group-choice occasions · weekends, events and shared breaks",
+    trigger: "Activate around recommendation behaviour, group plans, reviews, UGC and occasions where one person influences the choice.",
+    mediaRole: "Give a credible product find enough social value to travel from one person to the group.",
+    creatorStory: "Show the recommendation being passed on—not just stated. Capture the group reaction, choice or ritual that follows.",
+    kpis: "Share rate, saves, UGC response, referrals, social-commerce actions and group-occasion sales.",
+  },
+};
+
+const clusterActivation: Record<ClusterId, {
+  localInsight: string; channels: string[]; targeting: string; creatorArchetype: string;
+  creatorFit: string; creatorFormats: string; creatorMandatories: string;
+}> = {
+  dach: {
+    localInsight: "Morning routines are functional and disciplined. Frame NESCAFÉ RTD as a credible cold-coffee accelerator that fits commuting, office arrival and pre-workout behaviour without losing taste standards.",
+    channels: [
+      "YouTube · 6s Bumper and 15s OLV for fast reach and product-role demonstration",
+      "Meta · Reels, Stories and Feed for routine, productivity and lifestyle contexts",
+      "TikTok · native in-feed vertical video built around real morning/afternoon behaviour",
+      "DOOH + retail · transit, office, convenience and gym-adjacent placements close to purchase",
+    ],
+    targeting: "Commuters, early starters, fitness/routine audiences and office or WFH contexts; layer daypart, transit and convenience-store proximity where available.",
+    creatorArchetype: "Coffee lifestylers, productivity voices, fitness/running creators and credible everyday vloggers.",
+    creatorFit: "Strong Germany/DACH audience concentration; routine-led content; clean visual language; credible coffee or active-lifestyle permission; avoids exaggerated energy claims.",
+    creatorFormats: "GRWM, morning routine, pre-workout/commute vlog, desk-reset and ‘what I’m getting ready for’ vertical stories.",
+    creatorMandatories: "Show a real preparation or reset behaviour, clear cold product visibility, a specific next activity and a natural Always Ready payoff. Capture clean 9:16 masters for paid boosting.",
+  },
+  benelux: {
+    localInsight: "The opportunity is a deliberate café-quality micro-treat inside a modern routine. Use cycling, work/study breaks and local discovery without turning the brand into generic indulgence.",
+    channels: [
+      "Meta · Reels, Stories and carousel for aesthetic taste, routine and discovery content",
+      "TikTok · creator-led flavour discovery, café comparison and micro-treat formats",
+      "YouTube · Shorts plus 15s OLV for sensory and product-quality proof",
+      "Retail + mobility media · cycling routes, urban convenience and shopper touchpoints",
+    ],
+    targeting: "Urban cyclists, coffee and food explorers, work/study audiences and premium-snack seekers; prioritise mid-morning and mid-afternoon discovery windows.",
+    creatorArchetype: "Aesthetic food and drink creators, barista voices, city-cycling vloggers and modern lifestyle curators.",
+    creatorFit: "Taste vocabulary and visual craft; trusted local recommendations; strong save/share behaviour; credible rather than over-produced café comparisons.",
+    creatorFormats: "Koffietijd break, bike-to-work ritual, barista-style taste test, local hotspot pairing and ‘small reward’ diary.",
+    creatorMandatories: "Describe flavour and texture specifically, show coldness and pack clearly, anchor the story in a real local routine and deliver editable vertical cutdowns for paid social.",
+  },
+  nordics: {
+    localInsight: "Coffee needs to feel useful, well designed and understated. Let clean function, portability and credible coffee taste lead across transit, cycling, ferry and outdoor transitions.",
+    channels: [
+      "TikTok + Meta Reels · short-form commute, active-lifestyle and minimalist routine content",
+      "YouTube · Shorts and 15s OLV for functional product demonstration",
+      "CTV/OLV · incremental reach around work, study and lifestyle content",
+      "Transit/retail DOOH · stations, ferries, campuses and convenience environments",
+    ],
+    targeting: "Mobile urban audiences, commuters, students and active-lifestyle cohorts; use mobility, weather and outdoor-context signals with restrained frequency.",
+    creatorArchetype: "Minimalist lifestyle creators, commuters, runners/cyclists, students and design-conscious coffee voices.",
+    creatorFit: "Understated delivery, clean composition, high local relevance and believable functional use; avoid loud challenge formats or forced indulgence.",
+    creatorFormats: "Commute POV, ferry/transit diary, pack-and-go routine, active break and simple first-sip product review.",
+    creatorMandatories: "Make the function immediate, show portable use and coffee credibility, keep claims grounded, and supply clean footage with space for local supers and paid cutdowns.",
+  },
+  cee: {
+    localInsight: "NESCAFÉ RTD can make a global coffee brand feel like accessible everyday luxury. Product visibility, flavour excitement and social currency should work together near impulse purchase.",
+    channels: [
+      "TikTok · fast product discovery, snack review, challenge and creator-whitelisted formats",
+      "Meta · Reels, Stories and Feed for lifestyle signalling and retargeting",
+      "YouTube · Shorts and 6s/15s OLV for broad reach and pack recognition",
+      "Retail media + DOOH · convenience stores, campuses, malls and urban youth routes",
+    ],
+    targeting: "Students, young professionals, snack/flavour explorers and trend-engaged audiences; connect social discovery to convenience-retail proximity and retargeting.",
+    creatorArchetype: "Snack reviewers, trend translators, campus/city vloggers and aspirational lifestyle creators.",
+    creatorFit: "High product-discovery credibility, visible engagement from the local market, strong pack handling and an ability to make premium cues feel attainable.",
+    creatorFormats: "First-try review, flavour ranking, convenience-store find, campus-to-city transition and group reaction.",
+    creatorMandatories: "Land flavour plus coffee quality, keep the pack recognisable, show where/how it is bought and capture a recommendation moment that can be boosted as a Partnership Ad.",
+  },
+  see: {
+    localInsight: "Refreshment is strongest when it leads into a social next step. Use visible heat, cold-product contrast and real afternoon-to-evening mobility—not generic beach imagery.",
+    channels: [
+      "Meta Reels + Stories · high-reach lifestyle, event and golden-hour contexts",
+      "TikTok · native creator stories around heat, plans, music and social movement",
+      "YouTube · Shorts, 6s Bumper and 15s OLV for refreshment and product proof",
+      "Weather/event media + DOOH · warm-day, coastal, campus, music and convenience locations",
+    ],
+    targeting: "Warm-weather audiences, students/young professionals, festival and music cohorts and people moving toward social occasions; layer temperature, time and event proximity.",
+    creatorArchetype: "Lifestyle hosts, music/event creators, coastal-city vloggers and socially connected coffee or food voices.",
+    creatorFit: "Strong local audience, genuine group chemistry, credible event/lifestyle access and an ability to show refreshment without losing coffee quality.",
+    creatorFormats: "Hot-afternoon reset, post-lecture plan, golden-hour journey, event preparation and group recommendation.",
+    creatorMandatories: "Show the state change, ice-cold sensory proof, a clear next plan and visible product use. Secure usage rights and clean vertical assets for weather/event-triggered paid support.",
+  },
+};
+
+type MarketLocal = {
+  driver: string;
+  available: string;
+  hero: string;
+  media: string;
+  localInsight: string;
+  coffeeContext: string;
+  mobilityContext: string;
+  retailContext: string;
+  validationAsk: string;
+  sourceBasis: string;
+  channels: string;
+  targeting: string;
+  creatorArchetype: string;
+  creatorFit: string;
+  creatorFormats: string;
+  creatorMandatories: string;
+  moments: Record<EngineId, string>;
+};
+
+type MarketDraft = {
+  audienceRoute: AudienceRoute;
+  objective: string;
+  evidence: Evidence;
+  scores: EngineScores;
+  activeEngine: EngineId;
+  local: MarketLocal;
 };
 
 const evidenceGroups = [
@@ -256,8 +414,62 @@ const scorePreset: Record<PriorityLevel, Record<Criterion, number>> = {
   S: { brand: 3.1, audience: 2.8, media: 2.8, distinctive: 3.0, transfer: 3.5 },
 };
 
-function scoresForCluster(cluster: ClusterId): EngineScores {
-  return Object.fromEntries(engineOrder.map((engine) => [engine, { ...scorePreset[clusters[cluster].levels[engine]] }])) as EngineScores;
+function scoresForLevels(levels: Record<EngineId, PriorityLevel>): EngineScores {
+  return Object.fromEntries(engineOrder.map((engine) => [engine, { ...scorePreset[levels[engine]] }])) as EngineScores;
+}
+
+function evidenceForMarket(marketId: MarketId): Evidence {
+  const profile = marketProfiles[marketId];
+  const available = clusters[markets[marketId].starter].available;
+  return {
+    brandPermission: profile.permission,
+    productTruth: `${available}. ${profile.hero}`,
+    brandPerformance: profile.whitespace,
+    audienceTension: profile.tension,
+    audienceBehaviour: profile.routine,
+    audienceProof: profile.reward,
+    mediaDemand: profile.mediaDemand,
+    mediaContext: profile.mediaContext,
+    mediaResponse: profile.mediaResponse,
+  };
+}
+
+function starterLocal(marketId: MarketId): MarketLocal {
+  const market = markets[marketId];
+  const profile = marketProfiles[marketId];
+  return {
+    driver: profile.driver,
+    available: clusters[market.starter].available,
+    hero: profile.hero,
+    media: profile.mediaContext,
+    localInsight: profile.localInsight,
+    coffeeContext: profile.coffeeContext,
+    mobilityContext: profile.routine,
+    retailContext: profile.retailContext,
+    validationAsk: profile.validationAsk,
+    sourceBasis: "Market-specific strategic starter informed by the European Coffee Report 2024–2025, DataReportal 2026 country reports, Eurostat transport context and local coffee-culture desk research. Replace hypotheses with local Nestlé brand, sales, audience, platform and retailer evidence before investment.",
+    channels: profile.channels.join("\n"),
+    targeting: profile.targeting,
+    creatorArchetype: profile.creatorArchetype,
+    creatorFit: profile.creatorFit,
+    creatorFormats: profile.creatorFormats,
+    creatorMandatories: `Open on a recognisable ${market.name} behaviour, not a borrowed cluster cue. Show a real product purchase or use, specific coffee and sensory proof, the next activity, clean 9:16 masters and paid-usage rights.`,
+    moments: { ...profile.moments },
+  };
+}
+
+function defaultDraftForMarket(marketId: MarketId): MarketDraft {
+  const profile = marketProfiles[marketId];
+  const scores = scoresForLevels(profile.levels);
+  const activeEngine = [...engineOrder].sort((a, b) => weightedScore(scores[b]) - weightedScore(scores[a]))[0];
+  return {
+    audienceRoute: profile.route,
+    objective: profile.objective,
+    evidence: evidenceForMarket(marketId),
+    scores,
+    activeEngine,
+    local: starterLocal(marketId),
+  };
 }
 
 function weightedScore(scores: Record<Criterion, number>) {
@@ -275,14 +487,16 @@ function levelClass(level: string) {
 }
 
 export default function Home() {
+  const initialDraft = defaultDraftForMarket("germany");
   const [step, setStep] = useState(0);
-  const [clusterId, setClusterId] = useState<ClusterId>("dach");
-  const [marketName, setMarketName] = useState("Germany / Austria / Switzerland");
-  const [audienceRoute, setAudienceRoute] = useState<AudienceRoute>("Balanced");
-  const [objective, setObjective] = useState("Grow frequency across more daily moments");
-  const [evidence, setEvidence] = useState<Evidence>(demoEvidence.dach);
-  const [scores, setScores] = useState<EngineScores>(() => scoresForCluster("dach"));
-  const [activeEngine, setActiveEngine] = useState<EngineId>("start");
+  const [marketId, setMarketId] = useState<MarketId>("germany");
+  const [audienceRoute, setAudienceRoute] = useState<AudienceRoute>(initialDraft.audienceRoute);
+  const [objective, setObjective] = useState(initialDraft.objective);
+  const [evidence, setEvidence] = useState<Evidence>(initialDraft.evidence);
+  const [scores, setScores] = useState<EngineScores>(initialDraft.scores);
+  const [activeEngine, setActiveEngine] = useState<EngineId>(initialDraft.activeEngine);
+  const [local, setLocal] = useState<MarketLocal>(initialDraft.local);
+  const [marketDrafts, setMarketDrafts] = useState<Partial<Record<MarketId, MarketDraft>>>({});
   const [copied, setCopied] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -291,13 +505,18 @@ export default function Home() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (parsed.clusterId) setClusterId(parsed.clusterId);
-        if (parsed.marketName) setMarketName(parsed.marketName);
-        if (parsed.audienceRoute) setAudienceRoute(parsed.audienceRoute);
-        if (parsed.objective) setObjective(parsed.objective);
-        if (parsed.evidence) setEvidence(parsed.evidence);
-        if (parsed.scores) setScores(parsed.scores);
-        if (parsed.activeEngine) setActiveEngine(parsed.activeEngine);
+        if (parsed.version === 3 && parsed.marketId && markets[parsed.marketId as MarketId]) {
+          const nextMarket = parsed.marketId as MarketId;
+          const drafts = (parsed.drafts ?? {}) as Partial<Record<MarketId, MarketDraft>>;
+          const draft = drafts[nextMarket] ?? defaultDraftForMarket(nextMarket);
+          setMarketDrafts(drafts);
+          setMarketId(nextMarket);
+          loadDraft(draft);
+        } else {
+          const nextMarket = parsed.marketId && markets[parsed.marketId as MarketId] ? parsed.marketId as MarketId : "germany";
+          setMarketId(nextMarket);
+          loadDraft(defaultDraftForMarket(nextMarket));
+        }
       } catch {
         // Keep the built-in demo when a device draft cannot be read.
       }
@@ -307,32 +526,43 @@ export default function Home() {
 
   useEffect(() => {
     if (!hydrated) return;
+    const currentDraft = captureDraft();
     window.localStorage.setItem("nescafe-cep-builder", JSON.stringify({
-      clusterId, marketName, audienceRoute, objective, evidence, scores, activeEngine,
+      version: 3,
+      marketId,
+      drafts: { ...marketDrafts, [marketId]: currentDraft },
     }));
-  }, [hydrated, clusterId, marketName, audienceRoute, objective, evidence, scores, activeEngine]);
+  }, [hydrated, marketId, audienceRoute, objective, evidence, scores, activeEngine, local, marketDrafts]);
 
   const rankedEngines = useMemo(() => engineOrder
     .map((id) => ({ id, score: weightedScore(scores[id]) }))
     .sort((a, b) => b.score - a.score), [scores]);
 
-  const completeness = Math.round((Object.values(evidence).filter((value) => value.trim()).length / Object.keys(evidence).length) * 100);
   const activeScore = weightedScore(scores[activeEngine]);
   const activeQualifies = activeScore >= 3.5 && scores[activeEngine].brand >= 3 && scores[activeEngine].audience >= 3 && scores[activeEngine].media >= 2;
-  const cluster = clusters[clusterId];
+  const market = markets[marketId];
+  const activation = engineActivation[activeEngine];
 
-  function selectCluster(next: ClusterId) {
-    setClusterId(next);
-    setEvidence(demoEvidence[next]);
-    const nextScores = scoresForCluster(next);
-    setScores(nextScores);
-    const nextTop = [...engineOrder].sort((a, b) => weightedScore(nextScores[b]) - weightedScore(nextScores[a]))[0];
-    setActiveEngine(nextTop);
-    const defaultMarkets: Record<ClusterId, string> = {
-      dach: "Germany / Austria / Switzerland", benelux: "Belgium / Netherlands / Luxembourg",
-      nordics: "Nordics", cee: "Central & Eastern Europe", see: "South East Europe + Greece",
-    };
-    setMarketName(defaultMarkets[next]);
+  function captureDraft(): MarketDraft {
+    return { audienceRoute, objective, evidence, scores, activeEngine, local };
+  }
+
+  function loadDraft(draft: MarketDraft) {
+    setAudienceRoute(draft.audienceRoute);
+    setObjective(draft.objective);
+    setEvidence(draft.evidence);
+    setScores(draft.scores);
+    setActiveEngine(draft.activeEngine);
+    setLocal(draft.local);
+  }
+
+  function selectMarket(next: MarketId) {
+    const drafts = { ...marketDrafts, [marketId]: captureDraft() };
+    const nextDraft = drafts[next] ?? defaultDraftForMarket(next);
+    setMarketDrafts(drafts);
+    setMarketId(next);
+    loadDraft(nextDraft);
+    setCopied(false);
   }
 
   function updateScore(engine: EngineId, criterion: Criterion, value: number) {
@@ -340,8 +570,9 @@ export default function Home() {
   }
 
   function resetDraft() {
-    setEvidence(demoEvidence[clusterId]);
-    setScores(scoresForCluster(clusterId));
+    const fresh = defaultDraftForMarket(marketId);
+    setMarketDrafts((current) => ({ ...current, [marketId]: fresh }));
+    loadDraft(fresh);
     setCopied(false);
   }
 
@@ -353,9 +584,8 @@ export default function Home() {
     return `NESCAFÉ RTD — CEP ENGINE MARKET BRIEF
 
 MARKET
-${marketName}
-Cluster: ${cluster.name} — ${cluster.profile}
-Growth driver: ${cluster.driver}
+${market.name}
+Growth driver: ${local.driver}
 Audience route: ${audienceRoute}
 Objective: ${objective}
 
@@ -374,14 +604,51 @@ Strategic job: ${engines[activeEngine].job}
 Audience reward: ${audienceRewards[audienceRoute][activeEngine]}
 
 LOCAL HOOK DIRECTION
-${cluster.moments[activeEngine]}
+${local.moments[activeEngine]}
 
 PRODUCT PROOF
-Available: ${cluster.available}
-Hero: ${cluster.hero}
+Available: ${local.available}
+Hero: ${local.hero}
 
-MEDIA CONTEXT
-${cluster.media}
+CONSUMER INSIGHT
+${evidence.audienceTension || "To confirm"}
+Behaviour: ${evidence.audienceBehaviour || "To confirm"}
+
+HOW NESCAFÉ CAN OWN THIS MOMENT
+${engines[activeEngine].job}
+${evidence.brandPermission || "Brand permission to confirm"}
+
+LOCAL MARKET INSIGHT
+${local.localInsight}
+
+MARKET CONTEXT
+Coffee/category: ${local.coffeeContext}
+Mobility and occasion: ${local.mobilityContext}
+Shopper and retail: ${local.retailContext}
+
+WHEN TO TARGET
+${activation.daypart}
+${activation.trigger}
+
+MEDIA PLAN
+Role: ${activation.mediaRole}
+Channels and formats:
+${local.channels.split("\n").filter(Boolean).map((channel) => `- ${channel}`).join("\n")}
+Audience and context targeting: ${local.targeting}
+Measurement: ${activation.kpis}
+
+CREATOR APPROACH
+Archetype: ${local.creatorArchetype}
+Selection criteria: ${local.creatorFit}
+Story: ${activation.creatorStory}
+Formats: ${local.creatorFormats}
+Mandatories and paid use: ${local.creatorMandatories}
+
+LOCAL VALIDATION REQUIRED
+${local.validationAsk}
+
+SOURCE BASIS
+${local.sourceBasis}
 
 EVIDENCE CAPTURED
 Brand permission: ${evidence.brandPermission || "To confirm"}
@@ -396,7 +663,7 @@ Media response: ${evidence.mediaResponse || "To confirm"}
 
 STATUS
 Working strategic hypothesis. Validate with local brand, audience and media data before investment decisions.`;
-  }, [marketName, cluster, audienceRoute, objective, rankedEngines, activeEngine, evidence]);
+  }, [market, local, audienceRoute, objective, rankedEngines, activeEngine, evidence, activation]);
 
   async function copyBrief() {
     await navigator.clipboard.writeText(briefText);
@@ -409,46 +676,31 @@ Working strategic hypothesis. Validate with local brand, audience and media data
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `NESCAFE_RTD_CEP_Brief_${cluster.name.replaceAll(" ", "_")}.txt`;
+    anchor.download = `NESCAFE_RTD_CEP_Brief_${market.name.replaceAll(" ", "_")}.txt`;
     anchor.click();
     URL.revokeObjectURL(url);
   }
 
-  const steps = ["Build evidence", "Score engines", "Translate to market", "Export brief"];
+  const steps = ["Evidence", "Engine scoring", "Market translation", "Market brief"];
 
   return (
     <main>
-      <header className="topbar">
-        <a className="brandmark" href="#top" aria-label="NESCAFÉ RTD CEP Engine Builder home">
-          <img className="brandmark-logo" src="nescafe-red-mark.png" alt="" aria-hidden="true" />
-          <span className="brandmark-copy">
-            <span className="brandmark-kicker">NESCAFÉ RTD</span>
-            <span className="brandmark-name">CEP Engine Builder</span>
-          </span>
-        </a>
+      <header className="topbar" id="top">
+        <div className="brandmark" aria-label="NESCAFÉ RTD CEP Engine Builder">
+          <div className="nescafe-logo-panel">
+            <img className="nescafe-logo" src={`${basePath}/nescafe-logo-white.png`} alt="NESCAFÉ" />
+          </div>
+          <span className="brandmark-name">CEP Engine Builder</span>
+        </div>
         <div className="topbar-actions">
-          <span className="draft-status"><span className="status-dot" /> Draft saved locally</span>
-          <button className="ghost-button" onClick={resetDraft}>Reset market demo</button>
+          <button className="ghost-button" onClick={resetDraft}>Reset</button>
         </div>
       </header>
-
-      <section className="hero" id="top">
-        <div>
-          <p className="eyebrow">EVIDENCE → ENGINE → CLUSTER → LOCAL HOOK</p>
-          <h1>Build the six<br /><span>“Ready to…”</span> engines.</h1>
-          <p className="hero-copy">Turn brand, audience and media evidence into a scored CEP system — then translate it into a market-ready creative brief.</p>
-        </div>
-        <div className="hero-visual" aria-label="Brand, audience and media combine to build one engine">
-          <div className="orbit orbit-one" /><div className="orbit orbit-two" />
-          <div className="signal signal-brand">BRAND</div><div className="signal signal-audience">AUDIENCE</div>
-          <div className="signal signal-media">MEDIA</div><div className="engine-core">ONE<br />ENGINE</div>
-        </div>
-      </section>
 
       <nav className="stepper" aria-label="Builder progress">
         {steps.map((label, index) => (
           <button key={label} onClick={() => setStep(index)} className={step === index ? "step active" : step > index ? "step complete" : "step"}>
-            <span>{step > index ? "✓" : index + 1}</span><strong>{label}</strong>
+            <strong>{label}</strong>
           </button>
         ))}
       </nav>
@@ -456,24 +708,19 @@ Working strategic hypothesis. Validate with local brand, audience and media data
       <div className="workspace">
         {step === 0 && (
           <section className="panel" aria-labelledby="evidence-title">
-            <div className="section-heading">
-              <div><p className="eyebrow">STEP 01 — BUILD THE EVIDENCE</p><h2 id="evidence-title">Where do the engines come from?</h2>
-                <p>Capture enough evidence for all three streams to agree. Use the profile as a starting hypothesis, then replace it with local facts.</p></div>
-              <div className="completion"><strong>{completeness}%</strong><span>evidence complete</span></div>
+            <div className="section-heading section-heading-visual">
+              <h2 id="evidence-title">Build the evidence</h2>
+              <img src={`${basePath}/rtd-evidence.webp`} alt="NESCAFÉ RTD being taken from a chilled fridge" />
             </div>
 
             <div className="setup-grid">
-              <label>Market / scope<input value={marketName} onChange={(event) => setMarketName(event.target.value)} /></label>
-              <label>Cluster<select value={clusterId} onChange={(event) => selectCluster(event.target.value as ClusterId)}>
-                {Object.entries(clusters).map(([id, item]) => <option key={id} value={id}>{item.name} — {item.profile}</option>)}
-              </select></label>
+              <label>Market<select value={marketId} onChange={(event) => selectMarket(event.target.value as MarketId)}>
+                {Object.entries(markets).sort(([, a], [, b]) => a.name.localeCompare(b.name)).map(([id, item]) => <option key={id} value={id}>{item.name}</option>)}
+              </select><small className="cluster-reference">{market.cluster} cluster</small></label>
               <label>Audience route<select value={audienceRoute} onChange={(event) => setAudienceRoute(event.target.value as AudienceRoute)}>
                 <option>Balanced</option><option>Explorer</option><option>Perfectionist</option>
               </select></label>
-              <label>Growth objective<select value={objective} onChange={(event) => setObjective(event.target.value)}>
-                <option>Grow frequency across more daily moments</option><option>Drive trial of the portfolio</option>
-                <option>Increase consideration and preference</option><option>Support a new SKU or flavour launch</option>
-              </select></label>
+              <label>Growth objective<input value={objective} onChange={(event) => setObjective(event.target.value)} /></label>
             </div>
 
             <div className="evidence-grid">
@@ -496,9 +743,7 @@ Working strategic hypothesis. Validate with local brand, audience and media data
         {step === 1 && (
           <section className="panel" aria-labelledby="score-title">
             <div className="section-heading">
-              <div><p className="eyebrow">STEP 02 — SCORE THE SIX ENGINES</p><h2 id="score-title">Which territories deserve engine status?</h2>
-                <p>Select an engine and score the five gates. The recommended rule is ≥3.5 overall, Brand and Audience ≥3, and Media ≥2.</p></div>
-              <div className="hypothesis-tag">Working hypothesis</div>
+              <h2 id="score-title">Score the engines</h2>
             </div>
 
             <div className="engine-strip">
@@ -541,17 +786,17 @@ Working strategic hypothesis. Validate with local brand, audience and media data
         {step === 2 && (
           <section className="panel" aria-labelledby="translate-title">
             <div className="section-heading">
-              <div><p className="eyebrow">STEP 03 — TRANSLATE TO MARKET</p><h2 id="translate-title">Localise the behaviour, not the idea.</h2>
-                <p>The engine stays stable. The cluster changes its priority. The market turns it into a recognisable local Hook.</p></div>
-              <select className="cluster-switch" value={clusterId} onChange={(event) => selectCluster(event.target.value as ClusterId)}>
-                {Object.entries(clusters).map(([id, item]) => <option key={id} value={id}>{item.name}</option>)}
+              <h2 id="translate-title">Translate to market</h2>
+              <select className="market-switch" aria-label="Market" value={marketId} onChange={(event) => selectMarket(event.target.value as MarketId)}>
+                {Object.entries(markets).sort(([, a], [, b]) => a.name.localeCompare(b.name)).map(([id, item]) => <option key={id} value={id}>{item.name}</option>)}
               </select>
             </div>
 
-            <div className="cluster-summary">
-              <div><span>{cluster.name}</span><h3>{cluster.profile}</h3><p>Growth driver: <b>{cluster.driver}</b></p></div>
-              <div><span>AVAILABLE PRODUCT</span><p>{cluster.available}</p></div>
-              <div><span>HERO PRODUCT PROOF</span><p>{cluster.hero}</p></div>
+            <div className="market-summary">
+              <div className="market-identity"><span>{market.cluster} CLUSTER</span><h3>{market.name}</h3><p>Independent evidence, scoring and brief</p></div>
+              <label><span>GROWTH DRIVER</span><input value={local.driver} onChange={(event) => setLocal((current) => ({ ...current, driver: event.target.value }))} /></label>
+              <label><span>AVAILABLE PRODUCT</span><input value={local.available} onChange={(event) => setLocal((current) => ({ ...current, available: event.target.value }))} /></label>
+              <label><span>HERO PRODUCT PROOF</span><input value={local.hero} onChange={(event) => setLocal((current) => ({ ...current, hero: event.target.value }))} /></label>
             </div>
             <div className="priority-table" role="table" aria-label="Engine priorities">
               <div className="priority-row header" role="row"><span>ENGINE</span><span>SCORE</span><span>PRIORITY</span><span>STRATEGIC JOB</span></div>
@@ -566,28 +811,42 @@ Working strategic hypothesis. Validate with local brand, audience and media data
             </div>
 
             <div className="hook-builder">
-              <div className="hook-intro"><p className="eyebrow">LOCAL HOOK BUILDER</p><h3>{engines[activeEngine].name}</h3>
-                <p>{engines[activeEngine].moment} · {engines[activeEngine].transition}</p>
-                <label>Audience expression<select value={audienceRoute} onChange={(event) => setAudienceRoute(event.target.value as AudienceRoute)}>
-                  <option>Balanced</option><option>Explorer</option><option>Perfectionist</option>
-                </select></label>
+              <div className="hook-intro">
+                <img className="hook-image" src={`${basePath}/rtd-commute.webp`} alt="NESCAFÉ RTD during a city commute" />
+                <div className="hook-intro-copy"><span>LOCAL HOOK</span><h3>{engines[activeEngine].name}</h3>
+                  <p>{engines[activeEngine].transition}</p>
+                  <label>Audience<select value={audienceRoute} onChange={(event) => setAudienceRoute(event.target.value as AudienceRoute)}>
+                    <option>Balanced</option><option>Explorer</option><option>Perfectionist</option>
+                  </select></label>
+                </div>
               </div>
               <div className="hook-output">
                 <article><span>HOLD FIXED</span><p>{engines[activeEngine].job}</p></article>
                 <article><span>AUDIENCE REWARD</span><p>{audienceRewards[audienceRoute][activeEngine]}</p></article>
-                <article className="wide"><span>LOCAL HOOK DIRECTION</span><p>{cluster.moments[activeEngine]}</p></article>
-                <article><span>PRODUCT PROOF</span><p>{cluster.hero}</p></article>
-                <article><span>MEDIA CONTEXT</span><p>{cluster.media}</p></article>
+                <article className="wide editable-output"><label><span>LOCAL HOOK DIRECTION</span><textarea value={local.moments[activeEngine]} onChange={(event) => setLocal((current) => ({ ...current, moments: { ...current.moments, [activeEngine]: event.target.value } }))} /></label></article>
+                <article className="editable-output"><label><span>LOCAL MARKET INSIGHT</span><textarea value={local.localInsight} onChange={(event) => setLocal((current) => ({ ...current, localInsight: event.target.value }))} /></label></article>
+                <article className="editable-output"><label><span>MEDIA CONTEXT</span><textarea value={local.media} onChange={(event) => setLocal((current) => ({ ...current, media: event.target.value }))} /></label></article>
               </div>
             </div>
+
+            <div className="market-detail-grid">
+              <label><span>COFFEE + CATEGORY CONTEXT</span><textarea value={local.coffeeContext} onChange={(event) => setLocal((current) => ({ ...current, coffeeContext: event.target.value }))} /></label>
+              <label><span>MOBILITY + OCCASION CONTEXT</span><textarea value={local.mobilityContext} onChange={(event) => setLocal((current) => ({ ...current, mobilityContext: event.target.value }))} /></label>
+              <label><span>SHOPPER + RETAIL CONTEXT</span><textarea value={local.retailContext} onChange={(event) => setLocal((current) => ({ ...current, retailContext: event.target.value }))} /></label>
+              <label><span>LOCAL VALIDATION REQUIRED</span><textarea value={local.validationAsk} onChange={(event) => setLocal((current) => ({ ...current, validationAsk: event.target.value }))} /></label>
+              <label><span>CHANNELS + FORMATS</span><textarea value={local.channels} onChange={(event) => setLocal((current) => ({ ...current, channels: event.target.value }))} /></label>
+              <label><span>AUDIENCE + CONTEXT TARGETING</span><textarea value={local.targeting} onChange={(event) => setLocal((current) => ({ ...current, targeting: event.target.value }))} /></label>
+              <label><span>CREATOR ARCHETYPE</span><textarea value={local.creatorArchetype} onChange={(event) => setLocal((current) => ({ ...current, creatorArchetype: event.target.value }))} /></label>
+              <label><span>CREATOR FORMATS</span><textarea value={local.creatorFormats} onChange={(event) => setLocal((current) => ({ ...current, creatorFormats: event.target.value }))} /></label>
+            </div>
+            <p className="market-source"><b>STARTER BASIS</b>{local.sourceBasis}</p>
           </section>
         )}
 
         {step === 3 && (
           <section className="panel brief-panel" aria-labelledby="brief-title">
             <div className="section-heading no-print">
-              <div><p className="eyebrow">STEP 04 — EXPORT THE MARKET BRIEF</p><h2 id="brief-title">Your engine recommendation is ready.</h2>
-                <p>Copy it into a working document, download it, or print the page to PDF.</p></div>
+              <h2 id="brief-title">Market brief</h2>
               <div className="brief-actions"><button className="secondary-button" onClick={copyBrief}>{copied ? "Copied" : "Copy brief"}</button>
                 <button className="secondary-button" onClick={downloadBrief}>Download .txt</button>
                 <button className="primary-button" onClick={() => window.print()}>Print / PDF</button></div>
@@ -595,9 +854,10 @@ Working strategic hypothesis. Validate with local brand, audience and media data
 
             <article className="brief-sheet">
               <div className="brief-header"><div><span>NESCAFÉ RTD</span><h2>CEP Engine Market Brief</h2></div>
-                <div className="brief-meta"><b>{cluster.name}</b><span>{marketName}</span></div></div>
+                <div className="brief-header-side"><div className="brief-meta"><span>{market.cluster} CLUSTER</span><b>{market.name}</b></div>
+                  <img className="brief-image" src={`${basePath}/rtd-brief.webp`} alt="Cold NESCAFÉ RTD product in an active city moment" /></div></div>
               <div className="brief-grid">
-                <div className="brief-block"><span>GROWTH DRIVER</span><strong>{cluster.driver}</strong></div>
+                <div className="brief-block"><span>GROWTH DRIVER</span><strong>{local.driver}</strong></div>
                 <div className="brief-block"><span>AUDIENCE ROUTE</span><strong>{audienceRoute}</strong></div>
                 <div className="brief-block wide"><span>OBJECTIVE</span><strong>{objective}</strong></div>
               </div>
@@ -613,20 +873,51 @@ Working strategic hypothesis. Validate with local brand, audience and media data
                 <div className="selected-content">
                   <article><span>STRATEGIC JOB</span><p>{engines[activeEngine].job}</p></article>
                   <article><span>AUDIENCE REWARD</span><p>{audienceRewards[audienceRoute][activeEngine]}</p></article>
-                  <article className="wide"><span>LOCAL HOOK</span><p>{cluster.moments[activeEngine]}</p></article>
-                  <article><span>PRODUCT PROOF</span><p>{cluster.hero}</p></article><article><span>MEDIA CONTEXT</span><p>{cluster.media}</p></article>
+                  <article className="wide"><span>LOCAL HOOK</span><p>{local.moments[activeEngine]}</p></article>
+                  <article><span>PRODUCT PROOF</span><p>{local.hero}</p></article><article><span>AVAILABLE PRODUCTS</span><p>{local.available}</p></article>
                 </div>
               </div>
-              <div className="brief-footer"><b>WORKING STRATEGIC HYPOTHESIS</b><span>Validate with local brand, audience and media data before investment decisions.</span></div>
+
+              <div className="brief-section">
+                <span className="brief-label">MARKET SPRINGBOARD</span>
+                <div className="insight-grid">
+                  <article><span>CONSUMER INSIGHT</span><p>{evidence.audienceTension}</p><p className="detail-line">{evidence.audienceBehaviour}</p></article>
+                  <article><span>HOW NESCAFÉ CAN OWN THE MOMENT</span><p>{engines[activeEngine].job}</p><p className="detail-line">{evidence.brandPermission}</p></article>
+                  <article><span>LOCAL MARKET INSIGHT</span><p>{local.localInsight}</p></article>
+                  <article><span>WHEN TO TARGET</span><strong>{activation.daypart}</strong><p>{activation.trigger}</p></article>
+                  <article><span>COFFEE + CATEGORY CONTEXT</span><p>{local.coffeeContext}</p></article>
+                  <article><span>MOBILITY + OCCASION CONTEXT</span><p>{local.mobilityContext}</p></article>
+                  <article><span>SHOPPER + RETAIL CONTEXT</span><p>{local.retailContext}</p></article>
+                  <article><span>LOCAL VALIDATION REQUIRED</span><p>{local.validationAsk}</p></article>
+                </div>
+              </div>
+
+              <div className="brief-section activation-grid">
+                <article className="activation-card media-activation">
+                  <div className="activation-heading"><span>MEDIA OUTPUT</span><h3>Channels, timing and activation</h3></div>
+                  <div className="activation-row"><span>MEDIA ROLE</span><p>{activation.mediaRole}</p></div>
+                  <div className="activation-row"><span>CHANNELS + FORMATS</span><ul>{local.channels.split("\n").filter(Boolean).map((channel) => <li key={channel}>{channel}</li>)}</ul></div>
+                  <div className="activation-row"><span>AUDIENCE + CONTEXT</span><p>{local.targeting}</p></div>
+                  <div className="activation-row"><span>MEASUREMENT</span><p>{activation.kpis}</p></div>
+                </article>
+
+                <article className="activation-card creator-activation">
+                  <div className="activation-heading"><span>CREATOR OUTPUT</span><h3>Who to use and what to make</h3></div>
+                  <div className="activation-row"><span>CREATOR ARCHETYPE</span><p>{local.creatorArchetype}</p></div>
+                  <div className="activation-row"><span>SELECTION CRITERIA</span><p>{local.creatorFit}</p></div>
+                  <div className="activation-row"><span>CREATOR STORY</span><p>{activation.creatorStory}</p></div>
+                  <div className="activation-row"><span>FORMATS + TERRITORIES</span><p>{local.creatorFormats}</p></div>
+                  <div className="activation-row"><span>MANDATORIES + PAID USE</span><p>{local.creatorMandatories}</p></div>
+                </article>
+              </div>
+              <div className="brief-footer"><b>WORKING STRATEGIC HYPOTHESIS</b><span>{local.sourceBasis}</span></div>
             </article>
           </section>
         )}
 
         <div className="navigation no-print"><button className="secondary-button" disabled={step === 0} onClick={() => setStep((current) => Math.max(0, current - 1))}>Back</button>
-          <span>Step {step + 1} of 4</span><button className="primary-button" disabled={step === 3} onClick={() => setStep((current) => Math.min(3, current + 1))}>{step === 2 ? "Build brief" : "Continue"}</button></div>
+          <button className="primary-button" disabled={step === 3} onClick={() => setStep((current) => Math.min(3, current + 1))}>{step === 2 ? "Build brief" : "Continue"}</button></div>
       </div>
-
-      <footer className="site-footer no-print"><span>NESCAFÉ RTD · ALWAYS READY</span><span>Internal working tool · Strategic hypotheses require local validation</span></footer>
     </main>
   );
 }

@@ -5,8 +5,7 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const metadata: Metadata = {
   title: "NESCAFÉ RTD CEP Engine Builder",
-  description: "Build, score and translate the six Always Ready category entry point engines.",
-  other: { "codex-preview": "development" },
+  description: "Turn brand, audience and media evidence into a market-ready NESCAFÉ RTD CEP brief.",
   icons: { icon: `${basePath}/favicon.svg`, shortcut: `${basePath}/favicon.svg` },
 };
 
